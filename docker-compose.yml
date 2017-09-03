@@ -1,40 +1,70 @@
-# Версия docker-compose
 version: '2'
-# Список наших сервисов (контейнеров)
 services:
     php:
-        # у нас свой образ для PHP, указываем путь к нему и говорим что его надо собрать
         build: ./images/php
-        # этот образ будет общаться с mysql
-        links:
-            - mysql
-        # монтируем директорию с проектами
         volumes:
             - ./www:/var/www/html
             - ./hosts:/etc/apache2/sites-enabled
             - ./logs:/var/log/apache2
-        # маршрутизируем порты
         ports:
             - "80:80"
+            - "9001:9001"
+        expose:
+            - "9000"
         environment:
             APACHE_LOG_DIR: /var/log/apache2
-    mysql:
-        image: mysql:8
+            XDEBUG_CONFIG: "remote_host=172.17.0.1"
+            PHP_IDE_CONFIG: "serverName=yii2.local"
+    node:
+        build: ./images/nodejs
+        environment:
+          - NODE_ENV=development
+        volumes:
+          - ./www/angular.local:/usr/src/app
         ports:
-            - "3306:3306"
+          - "3000:3000"
+          - "4200:4200"
+        command: "node /usr/src/app/index.js"
+    mysql:
+        image: mysql:5
+        ports:
+            - "3306:3306"            
         volumes:
             - ./mysql:/var/lib/mysql
-        # задаем пароль для root пользователя
         environment:
             MYSQL_ROOT_PASSWORD: 1234
+    maria:
+        image: mariadb:10
+        ports:
+            - "3307:3306"            
+        volumes:
+            - ./mariadb:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: 1234
+    percona:
+        image: percona:5
+        ports:
+            - "3308:3306"            
+        volumes:
+            - ./percona:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: 1234
+    sphinx:
+        build: ./images/sphinxsearch
+        depends_on:
+            - mysql
+        ports:
+            - "9306:9306"
+        volumes:
+            - ./sphinxsearch/config:/etc/sphinxsearch
+            - ./sphinxsearch/data:/var/lib/sphinxsearch/data
+            - ./sphinxsearch/log:/var/log/sphinxsearch
     phpmyadmin:
         image: 'phpmyadmin/phpmyadmin'
         restart: always
         ports:
-           - '8080:80'
-        links:
-            - mysql
+           - '8081:80'
         environment:
             MYSQL_USERNAME: root
             MYSQL_ROOT_PASSWORD: 1234
-            PMA_HOST: mysql
+            PMA_HOST: percona
