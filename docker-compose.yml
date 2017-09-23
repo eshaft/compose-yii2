@@ -15,6 +15,10 @@ services:
             APACHE_LOG_DIR: /var/log/apache2
             XDEBUG_CONFIG: "remote_host=172.17.0.1"
             PHP_IDE_CONFIG: "serverName=yii2.local"
+    memcached: 
+        image: memcached:latest
+        ports:
+            - "11211:11211"
     node:
         build: ./images/nodejs
         environment:

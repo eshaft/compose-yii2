@@ -82,6 +82,27 @@ class SiteController extends Controller
             ->all();
 
         var_dump($rows); exit;*/
+
+        /*$cache = \Yii::$app->cache;
+
+        $key = 'name';
+
+        $data = $cache->get($key);
+
+        if ($data === false) {
+            // $data нет в кэше, вычисляем заново
+            $data = 'Igor';
+
+            // Сохраняем значение $data в кэше. Данные можно получить в следующий раз.
+            $cache->set($key, $data);
+        }
+
+        $data = \Yii::$app->cache->getOrSet($key, function () {
+            return 'Igorrr';
+        });
+
+        echo $data; exit;*/
+
         return $this->render('index');
     }
 
