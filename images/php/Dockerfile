@@ -37,10 +37,14 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 	&& composer global require "codeception/verify:*" \
 	&& ln -s ~/.composer/vendor/codeception/codeception/codecept /usr/local/bin/codecept \
 	&& a2enmod rewrite \
+    && a2enmod ssl \
 	&& /etc/init.d/apache2 restart
 
 # Добавим свой php.ini, можем в нем определять свои значения конфига
 ADD php.ini /usr/local/etc/php/conf.d/40-custom.ini
+
+#SSL
+ADD ./ssl /usr/home/ssl
 
 # Запускаем контейнер
 # Из документации: The main purpose of a CMD is to provide defaults for an executing container. These defaults can include an executable, 
